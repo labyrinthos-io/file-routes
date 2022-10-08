@@ -1,0 +1,27 @@
+{
+  "name": "@labyrinthos/file-routes",
+  "version": "0.1.0",
+  "description": "",
+  "exports": {
+    "./lambda": "./lambda.mjs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/labyrinthos-io/file-routes.git"
+  },
+  "keywords": [
+    "file",
+    "routing",
+    "lambda",
+    "express"
+  ],
+  "author": "Axel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/labyrinthos-io/file-routes/issues"
+  },
+  "homepage": "https://github.com/labyrinthos-io/file-routes#readme"
+}
