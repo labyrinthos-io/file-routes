@@ -49,6 +49,12 @@ const res = (mask) => {
 
         json: (value) => {
             self.type("application/json")
+            return JSON.stringify(
+                mask(value)
+            )
+        },
+        jsonMask: (value) => {
+            self.type("application/json")
             return done(
                 JSON.stringify(
                     mask(value)

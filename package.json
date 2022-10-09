@@ -1,9 +1,10 @@
 {
   "name": "@labyrinthos/file-routes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "exports": {
-    "./lambda": "./lambda.mjs"
+    "./lambda": "./lambda.mjs",
+    "./express": "./express.mjs"
   },
   "scripts": {
     "test": "echo \"Fucking what\""
@@ -25,7 +26,15 @@
   },
   "homepage": "https://github.com/labyrinthos-io/file-routes#readme",
   "dependencies": {
-    "fast-glob": "^3.2.12",
-    "json-mask": "^2.0.0"
-  }
+    "fast-glob": "^3.2.12"
+  },
+  "peerDependencies": {
+    "express": "^4.18.2"
+  },
+  "files": [
+    "express.mjs",
+    "lambda.mjs",
+    "load-routes.mjs",
+    "mask.mjs"
+  ]
 }
