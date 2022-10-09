@@ -1,6 +1,7 @@
 import glob from "fast-glob"
 import path from "path"
 import url from "url"
+import createMask from "./mask.mjs"
 
 const loadRoutes = async (dir) => {
     const handlers = {}
@@ -16,7 +17,21 @@ const loadRoutes = async (dir) => {
             )
         )
 
-        handlers[route] = info
+        handlers[route] = Object.fromEntries(
+            Object.entries(info)
+            .map(
+                ([method, info]) => [
+                    method,
+                    {
+                        ...info,
+                        maskFunc:
+                            (info.mask === undefined)
+                                ? (value) => value
+                                : createMask(info.mask)
+                    }
+                ]
+            )
+        )
     }
 
     return handlers
