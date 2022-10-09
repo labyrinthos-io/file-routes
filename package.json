@@ -7,7 +7,6 @@
     "./express": "./express.mjs"
   },
   "scripts": {
-    "test": "echo \"Fucking what\""
   },
   "repository": {
     "type": "git",
