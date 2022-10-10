@@ -129,7 +129,7 @@ before a return type function is called. `res.status(404).headers({}).json({})`
 ## Express Usage
 The example will generate handlers for the routes `thing` and `user/list`.
 
-### Lambda File Structure
+### Express File Structure
 ```
 project
 │  server.mjs
