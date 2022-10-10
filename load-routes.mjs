@@ -4,23 +4,29 @@ import url from "url"
 import createMask from "./mask.mjs"
 
 const loadRoutes = async (dir) => {
-    const handlers = {}
+    const handlers = []
     const sources = await glob(
-        ["**/*.mjs", "!**/-*.mjs"],
+        ["**/*.{mjs,js}", "!**/-*"],
         { cwd: dir }
     )
     for (const source of sources) {
-        const route = source.slice(0, -4)
+        const route =
+            source
+            .replace(/\.m?js$/, "")
+            .replace(
+                /\[(.+)]/,
+                (_, name) => `:${name}`
+            )
         const info = await import(
             url.pathToFileURL(
                 path.resolve(dir, source)
             )
         )
 
-        handlers[route] = Object.fromEntries(
-            Object.entries(info)
-            .map(
+        handlers.push(
+            ...Object.entries(info).map(
                 ([method, info]) => [
+                    route,
                     method,
                     {
                         ...info,

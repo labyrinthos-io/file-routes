@@ -1,83 +1,38 @@
+import routington from "routington"
+
 import loadRoutes from "./load-routes.mjs"
+import response from "./response.mjs"
 
-const response = ({ code, headers, value, ...rest }) => ({
-    ...rest,
-    statusCode: code ?? 200,
-    headers: headers ?? {},
-    body: value,
-})
-const headerValues = (defaultType, opts) => ({
-    code: opts.code,
+const notFound = {
+    statusCode: 404,
     headers: {
-        ...(opts.headers ?? {}),
-        "Content-Type": defaultType ?? opts.type
+        "Content-Type": "application/json",
     },
-})
-
-const res = (mask) => {
-    let code = 200
-    let headers = {}
-    let type = undefined
-
-    const done = (value, other = {}) => response({
-        code,
-        headers,
-        value,
-        ...other
+    body: JSON.stringify({ error: "Not Found" })
+}
+const badHandler = {
+    statusCode: 404,
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+        error: `
+            .handler is not a function.
+            Check the spelling of the exported object, I made that mistake
+            a bunch when testing.
+        `.trim().replace(/\s+/g, " ")
     })
-
-    const self = {
-        code: (newCode) => {
-            code = newCode
-            return self
-        },
-        headers: (newHeaders) => {
-            headers = {
-                "Content-Type": type,
-                ...newHeaders,
-            }
-            return self
-        },
-        type: (newType) => {
-            type = newType
-            headers = {
-                "Content-Type": type,
-                ...headers,
-            }
-            return self
-        },
-
-        json: (value) => {
-            self.type("application/json")
-            return JSON.stringify(
-                mask(value)
-            )
-        },
-        jsonMask: (value) => {
-            self.type("application/json")
-            return done(
-                JSON.stringify(
-                    mask(value)
-                )
-            )
-        },
-        text: (text) => {
-            self.type("text/plain")
-            return done(text)
-        },
-        html: (text) => {
-            self.type("text/html")
-            return done(text)
-        },
-        raw: (data) => done(data),
-        base64: (opts) => done(data, { isBase64Encoded: true }),
-    }
-
-    return self
 }
 
 const lambdaService = async (dir) => {
     const routes = await loadRoutes(dir)
+    const router = routington()
+
+    for (const [route, method, routeInfo] of routes) {
+        const fullRoute = `/${method}/${route}`
+        const [routeNode] = router.define(fullRoute)
+        routeNode.info = routeInfo
+    }
 
     return async (event) => {
         const method = event.requestContext.http.method.toLowerCase()
@@ -87,20 +42,22 @@ const lambdaService = async (dir) => {
             return routes
         }
 
-        const routeInfo = routes[route]?.[method]
+        const fullRoute = `/${method}/${route}`
+        const routeNode = router.match(fullRoute) ?? null
 
-        const handler = routeInfo?.handler ?? null
-        if (handler === null || typeof (handler) !== "function") {
-            return {
-                statusCode: 404,
-                headers: {
-                    "Content-Type": "text/plain",
-                },
-                body: "Not Found"
-            }
+        if (routeNode === null) {
+            return notFound
         }
 
-        return await handler(event, res(routeInfo.maskFunc))
+        const routeInfo = routeNode.node.info
+        const handler = routeInfo.handler ?? null
+        if (handler === null || typeof (handler) !== "function") {
+            return badHandler
+        }
+
+        event.params = routeNode.param
+        event.query = event.queryStringParameters ?? {}
+        return await handler(event, response(routeInfo.maskFunc))
     }
 }
 

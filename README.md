@@ -8,8 +8,13 @@ npm i @labyrinthos/file-routes
 
 ## Route Folder Structure
 All routes should be in a single folder that will be passed into the
-initialization function. Only files ending with `.mjs` will be imported used as
-routes. Any files starting with `-` will be ignored.
+initialization function. Only files ending with `.js` or `.mjs` will be imported
+and used as routes. Any files starting with `-` will be ignored. Files or
+folders can take path params by using [variable name] in the file (or folder)
+name.
+
+> Note: if using `.js` in route file names, `"type": "module"` needs to be in
+> the `package.json` file or the import will fail.
 
 ## Handler Function
 The handler functions need to export whichever HTTP verbs they will respond to
@@ -22,8 +27,10 @@ as objects with specific properties.
 | type | The type the handler function returns. Will eventually use for something cool on auto documentation
 | mask | If given, will be used to mask json data returned by the `jsonMask` function. Will override type in doc stuff when that gets made, so only one of them needs to be present
 
+> both examples will generate handlers for the routes
+> `/thing`, `/:userID/info`, and `/overlay/:overlayID`.
+
 ## Lambda Usage
-The example will generate handlers for the routes `thing` and `user/list`.
 
 ### API Gateway Setup
 The APIG route that calls the lambda must use `{path+}` at the end so that the
@@ -37,9 +44,11 @@ lambda
 ├─ node_modules
 ├─ routes
 │  │  thing.mjs
-│  ├─ user
+│  ├─ [userID]
 │  │  │  -internal.mjs
-│  │  │  list.mjs
+│  │  │  info.mjs
+│  ├─ overlay
+│  │  │  [overlayID].js
 ```
 
 ### Lambda Function
@@ -56,6 +65,7 @@ export async function handler(event) {
 ### Lambda Handler Arguments
 The handler is given 2 arguments:
 1. The event object that is passed into the lambda
+    a. The event object has
 2. A response object to help format returns easier, documented below
 
 ```javascript
@@ -127,7 +137,6 @@ before a return type function is called. `res.status(404).headers({}).json({})`
 
 
 ## Express Usage
-The example will generate handlers for the routes `thing` and `user/list`.
 
 ### Express File Structure
 ```
@@ -137,9 +146,11 @@ project
 ├─ node_modules
 ├─ routes
 │  │  thing.mjs
-│  ├─ user
+│  ├─ [userID]
 │  │  │  -internal.mjs
-│  │  │  list.mjs
+│  │  │  info.mjs
+│  ├─ overlay
+│  │  │  [overlayID].js
 ```
 
 ### server.mjs
