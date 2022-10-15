@@ -1,4 +1,4 @@
-import routington from "routington"
+import wayfarer from "wayfarer"
 
 import loadRoutes from "./load-routes.mjs"
 import response from "./response.mjs"
@@ -26,12 +26,26 @@ const badHandler = {
 
 const lambdaService = async (dir) => {
     const routes = await loadRoutes(dir)
-    const router = routington()
+    const router = wayfarer("/")
+
+    const placeholder = () => { }
+    router.on("/", placeholder)
 
     for (const [route, method, routeInfo] of routes) {
         const fullRoute = `/${method}/${route}`
-        const [routeNode] = router.define(fullRoute)
-        routeNode.info = routeInfo
+
+        router.on(
+            fullRoute,
+            async (params, event) => {
+                const handler = routeInfo.handler ?? null
+                if (handler === null || typeof (handler) !== "function") {
+                    return badHandler
+                }
+                event.params = params
+                event.query = event.queryStringParameters ?? {}
+                return await handler(event, response(routeInfo.maskFunc))
+            }
+        )
     }
 
     return async (event) => {
@@ -43,21 +57,7 @@ const lambdaService = async (dir) => {
         }
 
         const fullRoute = `/${method}/${route}`
-        const routeNode = router.match(fullRoute) ?? null
-
-        if (routeNode === null) {
-            return notFound
-        }
-
-        const routeInfo = routeNode.node.info
-        const handler = routeInfo.handler ?? null
-        if (handler === null || typeof (handler) !== "function") {
-            return badHandler
-        }
-
-        event.params = routeNode.param
-        event.query = event.queryStringParameters ?? {}
-        return await handler(event, response(routeInfo.maskFunc))
+        return await router(fullRoute, event)
     }
 }
 

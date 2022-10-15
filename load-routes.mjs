@@ -17,6 +17,7 @@ const loadRoutes = async (dir) => {
                 /\[(.+)]/,
                 (_, name) => `:${name}`
             )
+            .replace(/\/.+?\+$/, "/*")
         const info = await import(
             url.pathToFileURL(
                 path.resolve(dir, source)
@@ -27,7 +28,7 @@ const loadRoutes = async (dir) => {
             ...Object.entries(info).map(
                 ([method, info]) => [
                     route,
-                    method,
+                    method.toLowerCase(),
                     {
                         ...info,
                         maskFunc:

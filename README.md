@@ -11,14 +11,20 @@ All routes should be in a single folder that will be passed into the
 initialization function. Only files ending with `.js` or `.mjs` will be imported
 and used as routes. Any files starting with `-` will be ignored. Files or
 folders can take path params by using [variable name] in the file (or folder)
-name.
+name. Wildcard routes can be made by putting `+` at the end of a parameter route
+inside the `[]` (ex: `[path+].mjs`).
 
-> Note: if using `.js` in route file names, `"type": "module"` needs to be in
+> Note: If using `.js` in route file names, `"type": "module"` needs to be in
 > the `package.json` file or the import will fail.
+
+> Pathing Note: If a relative path is passed to the function for loading routes,
+> it will be relative to the current working directory (treat it as a file
+> function, not as a specialized import).
 
 ## Handler Function
 The handler functions need to export whichever HTTP verbs they will respond to
-as objects with specific properties.
+as objects with specific properties. The HTTP verb export should be all caps
+(GET/POST/HEAD/etc.).
 
 | Property | Description |
 | --- | --- |
@@ -69,7 +75,7 @@ The handler is given 2 arguments:
 2. A response object to help format returns easier, documented below
 
 ```javascript
-export const get = {
+export const GET = {
     description: "Just returns some random data.",
     mask: {
         a: "int",
@@ -180,7 +186,7 @@ same as the normal `res.json()` function, but will mask the value based on the
 `mask` property of the route info.
 
 ```javascript
-export const post = {
+export const POST = {
     description: "",
     mask: {
         a: "int",
