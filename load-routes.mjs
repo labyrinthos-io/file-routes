@@ -14,7 +14,7 @@ const loadRoutes = async (dir) => {
             source
             .replace(/\.m?js$/, "")
             .replace(
-                /\[(.+)]/,
+                /\[(.+?)]/g,
                 (_, name) => `:${name}`
             )
             .replace(/\/.+?\+$/, "/*")

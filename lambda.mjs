@@ -28,8 +28,10 @@ const lambdaService = async (dir) => {
     const routes = await loadRoutes(dir)
     const router = wayfarer("/")
 
+    console.log(routes)
+
     router.on("/", () => notFound)
-    router.on("/-docs", () => routes)
+    // router.on("/-docs", () => routes)
 
     for (const [route, method, routeInfo] of routes) {
         const fullRoute = `/${method}/${route}`
@@ -51,6 +53,10 @@ const lambdaService = async (dir) => {
     return async (event) => {
         const method = event.requestContext.http.method.toLowerCase()
         const route = event.pathParameters.path
+
+        if (route === "-docs") {
+            return routes
+        }
 
         const fullRoute = `/${method}/${route}`
         return await router(fullRoute, event)
