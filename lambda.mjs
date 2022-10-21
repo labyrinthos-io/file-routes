@@ -28,10 +28,7 @@ const lambdaService = async (dir) => {
     const routes = await loadRoutes(dir)
     const router = wayfarer("/")
 
-    console.log(routes)
-
     router.on("/", () => notFound)
-    // router.on("/-docs", () => routes)
 
     for (const [route, method, routeInfo] of routes) {
         const fullRoute = `/${method}/${route}`
@@ -45,7 +42,17 @@ const lambdaService = async (dir) => {
                 }
                 event.params = params
                 event.query = event.queryStringParameters ?? {}
-                return await handler(event, response(routeInfo.maskFunc))
+                event.sourceRoute = routeInfo.sourceRoute
+
+                const resFunc = response(routeInfo.maskFunc)
+                for (const action of routeInfo.actions) {
+                    const value = await action(event, resFunc)
+                    if (value !== undefined) {
+                        return value
+                    }
+                }
+
+                return await handler(event, resFunc)
             }
         )
     }

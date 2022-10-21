@@ -6,13 +6,37 @@ Lightweight library for using file-based routing in AWS Lambda and Express.
 npm i @labyrinthos/file-routes
 ```
 
+## Extra Request Properties
+The follow props are added to both the `Request` object in express and the
+`event` in lambda.
+
+| Property | Description |
+| --- | --- |
+| sourceRoute | The source route that was matched in the request. Will have the same format as the file names (minus the extesions) so that it is the same between both types of deployment.
+
 ## Route Folder Structure
 All routes should be in a single folder that will be passed into the
 initialization function. Only files ending with `.js` or `.mjs` will be imported
-and used as routes. Any files starting with `-` will be ignored. Files or
-folders can take path params by using [variable name] in the file (or folder)
-name. Wildcard routes can be made by putting `+` at the end of a parameter route
+and used as routes.
+
+Any files starting with `-` will be ignored. Files or folders can take path
+params by using [variable name] in the file (or folder) name.
+
+Wildcard routes can be made by putting `+` at the end of a parameter route
 inside the `[]` (ex: `[path+].mjs`).
+
+Actions can be run in front of routes (think app.use in express) by defining
+a `{actions}.mjs` (or `.js`) in the folder. These actions will be run in
+top-down order (so `/{actions}.mjs` will go before `/wat/{actions.mjs}`).
+Actions can send data back early to bail out of a route call the same way a
+normal handler function would send a value. An actions file should have a
+default export with an array of funtions in the order to be called, and each
+function will have the same argument list as the handler functions, so requests
+can be modified by an action before being passed to the handler.
+
+> Action functions apply to every route in the same folder, and every folder
+> under. To target specific routes with actions, you will need to check the path
+> of a request and ignore any routes you dont want to trigger.
 
 > Note: If using `.js` in route file names, `"type": "module"` needs to be in
 > the `package.json` file or the import will fail.

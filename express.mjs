@@ -14,7 +14,7 @@ export default async (dir) => {
     for (const [route, method, routeInfo] of routes) {
         router[method](
             `/${route}`,
-            (req, res, next) => {
+            async (req, res, next) => {
                 if (typeof routeInfo.handler !== "function") {
                     res.status(404)
                         .send(`
@@ -28,6 +28,13 @@ export default async (dir) => {
                 res.jsonMask = (data) => res.json(
                     routeInfo.maskFunc(data)
                 )
+                req.sourceRoute = routeInfo.sourceRoute
+                for (const action of routeInfo.actions) {
+                    await action(req, res, next)
+                    if (res.headersSent === true) {
+                        return
+                    }
+                }
                 routeInfo.handler(req, res, next)
             }
         )
