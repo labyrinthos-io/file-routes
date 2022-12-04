@@ -1,7 +1,7 @@
 import wayfarer from "wayfarer"
 
-import loadRoutes from "./load-routes.mjs"
-import response from "./response.mjs"
+import loadRoutes from "./lib/load-routes.mjs"
+import response from "./lib/response.mjs"
 
 const notFound = {
     statusCode: 404,
@@ -24,6 +24,12 @@ const badHandler = {
     })
 }
 
+const sendResponse = (info) => ({
+    statusCode: info.code,
+    headers: info.headers,
+    body: info.body,
+})
+
 const lambdaService = async (dir) => {
     const routes = await loadRoutes(dir)
     const router = wayfarer("/")
@@ -44,15 +50,17 @@ const lambdaService = async (dir) => {
                 event.query = event.queryStringParameters ?? {}
                 event.sourceRoute = routeInfo.sourceRoute
 
-                const resFunc = response(routeInfo.maskFunc)
+                const resFunc = response(...routeInfo.processors)
                 for (const action of routeInfo.actions) {
                     const value = await action(event, resFunc)
                     if (value !== undefined) {
-                        return value
+                        return sendResponse(value)
                     }
                 }
 
-                return await handler(event, resFunc)
+                return sendResponse(
+                    await handler(event, resFunc)
+                )
             }
         )
     }
