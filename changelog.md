@@ -1,3 +1,6 @@
+## 0.2.1
+- added base64 support for lambda funcs
+
 ## 0.2.0
 - added joker lib for validation and masking
 - reorganize files for publishes to go better

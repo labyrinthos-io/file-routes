@@ -31,6 +31,7 @@ export default async (dir) => {
         router[method](
             `/${route}`,
             async (req, res) => {
+                console.log(req.headers)
                 if (typeof routeInfo.handler !== "function") {
                     res.status(404)
                         .send(`

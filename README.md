@@ -96,6 +96,7 @@ Response types:
 - `.html`: html text response
 - `.raw`: return raw data, using the headers to set the Content-Type
 - `.redirect`: redirect, uses the content argument as the url to redirect to
+- `.base64`: send base64 encoded data back from a Lambda function
 
 #### Examples
 

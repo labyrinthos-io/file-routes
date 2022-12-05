@@ -28,6 +28,7 @@ const sendResponse = (info) => ({
     statusCode: info.code,
     headers: info.headers,
     body: info.body,
+    isBase64Encoded: info.isBase64Encoded
 })
 
 const lambdaService = async (dir) => {
