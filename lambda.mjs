@@ -1,4 +1,5 @@
 import wayfarer from "wayfarer"
+import cookie from "cookie"
 
 import loadRoutes from "./lib/load-routes.mjs"
 import response from "./lib/response.mjs"
@@ -27,6 +28,9 @@ const badHandler = {
 const sendResponse = (info) => ({
     statusCode: info.code,
     headers: info.headers,
+    cookies: Object.entries(info.cookies).map(
+        ([name, { value, options }]) => cookie.serialize(name, value, options)
+    ),
     body: info.body,
     isBase64Encoded: info.isBase64Encoded
 })

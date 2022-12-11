@@ -1,6 +1,6 @@
 {
   "name": "@labyrinthos/file-routes",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Lightweight library for using file-based routing in AWS Lambda and Express.",
   "exports": {
     "./lambda": "./lambda.mjs",
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/labyrinthos-io/file-routes#readme",
   "dependencies": {
     "@axel669/joker": "^0.3.1",
+    "cookie": "^0.5.0",
     "fast-glob": "^3.2.12",
     "wayfarer": "^7.0.1"
   },

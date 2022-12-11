@@ -77,7 +77,7 @@ The Response function has 2 call signatures:
 - `Response(data)`
 - `Response(headers, data)`
 
-The data is whatrever data is going to be return in its raw form (the provided
+The data is whatever data is going to be return in its raw form (the provided
 extra types will convert it for sending).
 The headers is an object with the keys in http header
 form (i.e. `Content-Type`).
@@ -97,6 +97,13 @@ Response types:
 - `.raw`: return raw data, using the headers to set the Content-Type
 - `.redirect`: redirect, uses the content argument as the url to redirect to
 - `.base64`: send base64 encoded data back from a Lambda function
+
+In addition to the response types, the response object has its own set of funcs
+to perform response formatting tasks for parts that are not the return data.
+
+- `.setCookie(name, value[, options])`:
+    See [cookie.serialize](https://www.npmjs.com/package/cookie) for details on
+    the options available to cookies
 
 #### Examples
 

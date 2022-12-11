@@ -1,3 +1,6 @@
+## 0.2.2
+- added setCookie
+
 ## 0.2.1
 - added base64 support for lambda funcs
 

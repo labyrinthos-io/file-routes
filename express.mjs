@@ -3,9 +3,14 @@ import express from "express"
 import loadRoutes from "./lib/load-routes.mjs"
 import response from "./lib/response.mjs"
 
+import testable from "./lib/express/testable.mjs"
+
 const sendResponse = (res, info) => {
     for (const [key, value] of Object.entries(info.headers)) {
         res.set(key, value)
+    }
+    for (const [name, { value, options }] of Object.entries(info.cookies)) {
+        res.cookie(name, value, options)
     }
     res.status(info.code)
         .send(info.body)
@@ -18,7 +23,8 @@ const renameWildcard = (req) => {
     req.params.wildcard = req.params[0]
     delete req.params[0]
 }
-export default async (dir) => {
+
+const expressService = async (dir) => {
     const routes = await loadRoutes(dir)
     const router = express.Router()
 
@@ -31,7 +37,6 @@ export default async (dir) => {
         router[method](
             `/${route}`,
             async (req, res) => {
-                console.log(req.headers)
                 if (typeof routeInfo.handler !== "function") {
                     res.status(404)
                         .send(`
@@ -61,3 +66,8 @@ export default async (dir) => {
 
     return router
 }
+// expressService.testable = async (dir) => testable(
+//     await expressService(dir)
+// )
+
+export default expressService
