@@ -1,3 +1,6 @@
+## 0.2.3
+- bugfix on lambda validation errors
+
 ## 0.2.2
 - added setCookie
 
