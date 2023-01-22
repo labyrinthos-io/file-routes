@@ -1,3 +1,6 @@
+## 0.2.4
+- added body parsing for lambda (only json and url encoded for now)
+
 ## 0.2.3
 - bugfix on lambda validation errors
 

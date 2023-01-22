@@ -4,26 +4,8 @@ import cookie from "cookie"
 import loadRoutes from "./lib/load-routes.mjs"
 import response from "./lib/response.mjs"
 
-const notFound = {
-    statusCode: 404,
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ error: "Not Found" })
-}
-const badHandler = {
-    statusCode: 404,
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-        error: `
-            .handler is not a function.
-            Check the spelling of the exported object, I made that mistake
-            a bunch when testing.
-        `.trim().replace(/\s+/g, " ")
-    })
-}
+import { notFound, badHandler } from "./lib/lambda/constants.mjs"
+import bodyParser from "./lib/lambda/body-parser.mjs"
 
 const sendResponse = (info) => ({
     statusCode: info.code,
@@ -54,6 +36,7 @@ const lambdaService = async (dir) => {
                 event.params = params
                 event.query = event.queryStringParameters ?? {}
                 event.sourceRoute = routeInfo.sourceRoute
+                event.data = bodyParser(event)
 
                 const resFunc = response(...routeInfo.processors)
                 for (const action of routeInfo.actions) {
